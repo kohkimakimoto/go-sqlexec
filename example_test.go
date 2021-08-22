@@ -33,11 +33,11 @@ func ExampleExec() {
 
 	// Example of custom SqlSource
 	// You can use your custom SqlSource
-	costom := CustomSqlSource()
+	custom := CustomSqlSource()
 
 	// Execute a set of SQL sources.
 	// Each SqlSource is executed in an isolated transaction.
-	if err := sqlexec.Exec(db, schema, data, data2, costom); err != nil {
+	if err := sqlexec.Exec(db, schema, data, data2, custom); err != nil {
 		log.Fatal(err)
 	}
 
