@@ -1,0 +1,17 @@
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.pem
+node_modules/
+/vendor
+/.vendor-new
+/.go-tools
+/coverage-report.html
+!.gitkeep
+/example.db
+/go-sqlexec
+
+# env
+.env
+.envrc
