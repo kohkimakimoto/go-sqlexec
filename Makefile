@@ -19,7 +19,7 @@ help:
 
 .PHONY: format
 format: ## Format go code
-	@go fmt $$(go list ./... | grep -v vendor)
+	@go fmt ./...
 
 .PHONY: deps
 deps: ## Install go modules
@@ -38,11 +38,11 @@ tools/clean: ## Clean installed tools
 
 .PHONY: test
 test: ## Test go code
-	@go test -cover ./...
+	@go test -race -timeout 30m -cover ./...
 
 .PHONY: test/verbose
 test/verbose: ## Run all tests with verbose outputting.
-	@go test -v -cover ./...
+	@go test -race -timeout 30m -v -cover ./...
 
 .PHONY: test/coverage
 test/coverage: ## Run all tests with coverage report outputting.
