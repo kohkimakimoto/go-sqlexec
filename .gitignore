@@ -4,13 +4,10 @@ Thumbs.db
 .vscode/
 *.pem
 node_modules/
-/vendor
-/.vendor-new
-/.go-tools
-/coverage-report.html
 !.gitkeep
-/example.db
-/go-sqlexec
+
+# dev
+/.dev
 
 # env
 .env

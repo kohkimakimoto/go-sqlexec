@@ -48,6 +48,10 @@ func SourceDir(dirname string) SqlSource {
 	return func(tx *sql.Tx) ([]string, error) {
 		var retStmts []string
 		if err := filepath.Walk(dirname, func(name string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
 			// skip directory
 			if info.IsDir() {
 				return nil
@@ -59,14 +63,14 @@ func SourceDir(dirname string) SqlSource {
 				return nil
 			}
 
-			f, err := os.Open(name)
-			if err != nil {
-				return err
+			f, err2 := os.Open(name)
+			if err2 != nil {
+				return err2
 			}
 			// parse SQL source file
-			stmts, err := ParseSQLStatements(f)
-			if err != nil {
-				return err
+			stmts, err3 := ParseSQLStatements(f)
+			if err3 != nil {
+				return err3
 			}
 
 			retStmts = append(retStmts, stmts...)

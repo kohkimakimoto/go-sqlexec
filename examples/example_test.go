@@ -1,4 +1,4 @@
-package sqlexec_test
+package examples_test
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ import (
 )
 
 func ExampleExec() {
-	db, err := sql.Open("sqlite3", "./example.db")
+	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		log.Fatal(err)
 	}
