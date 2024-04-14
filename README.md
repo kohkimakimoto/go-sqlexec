@@ -101,6 +101,7 @@ func CustomSqlSource() sqlexec.SqlSource {
 - `SourceString`: The SQLs are provided directly as strings.
 - `SourceFile`: The SQLs are provided from file(s).
 - `SourceDir`: The SQLs are provided from '*.sql' file(s) under the specific directory. The SQL files are executed in lexical order.
+- `SourceImporters`: The SQLs are provided from structs.
 
 ## Author
 

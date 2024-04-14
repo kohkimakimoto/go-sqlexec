@@ -10,6 +10,7 @@ import (
 
 type ImporterFunc func() []interface{}
 
+// SourceImporter is a SqlSource that generates SQLs from the structs returned by the ImporterFunc.
 func SourceImporter(importerFunc ImporterFunc) SqlSource {
 	return func(tx *sql.Tx) ([]string, error) {
 		importerStructs := importerFunc()
