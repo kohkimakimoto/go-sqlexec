@@ -1,7 +1,9 @@
 package sqlexec
 
 import (
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
+	"path/filepath"
 	"testing"
 )
 
@@ -30,4 +32,18 @@ departments:
 		"INSERT INTO employees (employee_id, name, age, department_id) VALUES (1, '田中一郎', 34, 11), (2, '佐藤恵子', 28, 1);",
 		"INSERT INTO departments (department_id, name) VALUES (1, '営業部'), (2, '技術部');",
 	}, stmts)
+}
+
+func TestSourceYamlImporter(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mock.ExpectBegin()
+	mock.ExpectExec(`INSERT INTO employees \(employee_id, name, age, department_id\) VALUES \(1, '田中一郎', 34, 11\), \(2, '佐藤恵子', 28, 1\);`).WillReturnResult(sqlmock.NewResult(0, 2))
+	mock.ExpectExec(`INSERT INTO departments \(department_id, name\) VALUES \(1, '営業部'\), \(2, '技術部'\);`).WillReturnResult(sqlmock.NewResult(0, 2))
+	mock.ExpectCommit()
+	err = Exec(db, SourceYamlImporter(filepath.Join("testdata", "data.yml")))
+	assert.Nil(t, err)
 }
