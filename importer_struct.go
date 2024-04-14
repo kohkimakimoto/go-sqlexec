@@ -8,10 +8,10 @@ import (
 	"unicode"
 )
 
-type ImporterFunc func() []interface{}
+type StructImporterFunc func() []interface{}
 
-// SourceImporter is a SqlSource that generates SQLs from the structs returned by the ImporterFunc.
-func SourceImporter(importerFunc ImporterFunc) SqlSource {
+// SourceStructImporter is a SqlSource that generates SQLs from the structs returned by the StructImporterFunc.
+func SourceStructImporter(importerFunc StructImporterFunc) SqlSource {
 	return func(tx *sql.Tx) ([]string, error) {
 		importerStructs := importerFunc()
 		if len(importerStructs) == 0 {
@@ -19,13 +19,13 @@ func SourceImporter(importerFunc ImporterFunc) SqlSource {
 		}
 		sqls := make([]string, 0, len(importerStructs))
 		for _, im := range importerStructs {
-			sqls = append(sqls, toSQL(im))
+			sqls = append(sqls, structToSQL(im))
 		}
 		return sqls, nil
 	}
 }
 
-func toSQL(obj interface{}) string {
+func structToSQL(obj interface{}) string {
 	val := reflect.ValueOf(obj)
 	typ := val.Type()
 
@@ -147,7 +147,6 @@ func resolveValue(fieldValue reflect.Value) string {
 
 // escapeSQLString escapes single quotes in strings for SQL queries
 func escapeSQLString(str string) string {
-
 	return strings.ReplaceAll(str, "'", "''")
 }
 

@@ -37,7 +37,7 @@ type TestUserImporter struct {
 
 func TestToSQL(t *testing.T) {
 	user := TestUserImporter{Id: 1, Name: "test", Age: 20, notUsedField: "notUsed"}
-	sql := toSQL(user)
+	sql := structToSQL(user)
 	assert.Equal(t, "INSERT INTO test_user (id, name, age) VALUES (1, 'test', 20);", sql)
 }
 
@@ -52,7 +52,7 @@ func TestSourceImporter(t *testing.T) {
 	mock.ExpectExec(`INSERT INTO test_user \(id, name, age\) VALUES \(2, 'test2', 20\);`).WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	err = Exec(db, SourceImporter(func() []interface{} {
+	err = Exec(db, SourceStructImporter(func() []interface{} {
 		return []interface{}{
 			TestUserImporter{Id: 1, Name: "test1", Age: 10},
 			TestUserImporter{Id: 2, Name: "test2", Age: 20},
