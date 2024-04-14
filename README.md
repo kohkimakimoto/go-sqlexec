@@ -1,5 +1,9 @@
 # go-sqlexec
 
+[![test](https://github.com/kohkimakimoto/go-sqlexec/actions/workflows/test.yml/badge.svg)](https://github.com/kohkimakimoto/go-sqlexec/actions/workflows/test.yml)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kohkimakimoto/go-sqlexec/blob/main/LICENSE)
+[![Go Reference](https://pkg.go.dev/badge/github.com/kohkimakimoto/go-sqlexec.svg)](https://pkg.go.dev/github.com/kohkimakimoto/go-sqlexec)
+
 go-sqlexec is a library for executing SQL queries from various sources such as files, directories and strings.
 
 It is a straightforward library that features an `Exec` function. You can use this function with a database instance and `SqlSource` options to run the SQL queries you need. That's it!
