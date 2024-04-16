@@ -20,13 +20,18 @@ func SourceYamlImporter(filenames ...string) SqlSource {
 			if err != nil {
 				return nil, err
 			}
-			retStmts = append(retStmts, stmts...)
+			if len(stmts) > 0 {
+				retStmts = append(retStmts, stmts...)
+			}
 		}
 		return retStmts, nil
 	}
 }
 
 func yamlToSQLs(data []byte) ([]string, error) {
+	if len(data) == 0 {
+		return []string{}, nil
+	}
 	var parsedData yaml.Node
 	if err := yaml.Unmarshal(data, &parsedData); err != nil {
 		return nil, err
