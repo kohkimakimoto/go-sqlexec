@@ -8,7 +8,8 @@ import (
 )
 
 func TestYamlToSQLs(t *testing.T) {
-	stmts, err := yamlToSQLs([]byte(`
+	t.Run("general", func(t *testing.T) {
+		stmts, err := yamlToSQLs([]byte(`
 employees:
   - employee_id: 1
     name: "田中一郎"
@@ -27,11 +28,18 @@ departments:
   - department_id: 2
     name: "技術部"
 `))
-	assert.NoError(t, err)
-	assert.Equal(t, []string{
-		"INSERT INTO employees (employee_id, name, age, department_id) VALUES (1, '田中一郎', 34, 11), (2, '佐藤恵子', 28, 1);",
-		"INSERT INTO departments (department_id, name) VALUES (1, '営業部'), (2, '技術部');",
-	}, stmts)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"INSERT INTO employees (employee_id, name, age, department_id) VALUES (1, '田中一郎', 34, 11), (2, '佐藤恵子', 28, 1);",
+			"INSERT INTO departments (department_id, name) VALUES (1, '営業部'), (2, '技術部');",
+		}, stmts)
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		stmts, err := yamlToSQLs([]byte(""))
+		assert.NoError(t, err)
+		assert.Equal(t, []string{}, stmts)
+	})
 }
 
 func TestSourceYamlImporter(t *testing.T) {
