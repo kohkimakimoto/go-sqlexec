@@ -40,6 +40,20 @@ departments:
 		assert.NoError(t, err)
 		assert.Equal(t, []string{}, stmts)
 	})
+
+	t.Run("null values", func(t *testing.T) {
+		stmts, err := yamlToSQLs([]byte(`
+employees:
+  - employee_id: 1
+    name: null
+    age: 34
+    department_id: 11
+`))
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"INSERT INTO employees (employee_id, name, age, department_id) VALUES (1, null, 34, 11);",
+		}, stmts)
+	})
 }
 
 func TestSourceYamlImporter(t *testing.T) {
