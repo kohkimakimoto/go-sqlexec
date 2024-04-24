@@ -44,7 +44,7 @@ format: ## Format go code
 
 .PHONY: lint
 lint: ## Lint source code
-	@go vet ./... ; staticcheck ./...
+	@staticcheck ./...
 
 .PHONY: test
 test: ## Run tests
