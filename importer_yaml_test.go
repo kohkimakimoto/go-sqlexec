@@ -69,3 +69,36 @@ func TestSourceYamlImporter(t *testing.T) {
 	err = Exec(db, SourceYamlImporter(filepath.Join("testdata", "data.yml")))
 	assert.Nil(t, err)
 }
+
+func TestSourceYamlStringImporter(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mock.ExpectBegin()
+	mock.ExpectExec(`INSERT INTO employees \(employee_id, name, age, department_id\) VALUES \(1, '田中一郎', 34, 11\), \(2, '佐藤恵子', 28, 1\);`).WillReturnResult(sqlmock.NewResult(0, 2))
+	mock.ExpectExec(`INSERT INTO departments \(department_id, name\) VALUES \(1, '営業部'\), \(2, '技術部'\);`).WillReturnResult(sqlmock.NewResult(0, 2))
+	mock.ExpectCommit()
+	err = Exec(db, SourceYamlStringImporter(`
+employees:
+  - employee_id: 1
+    name: "田中一郎"
+    age: 34
+    department_id: 11
+
+  - employee_id: 2
+    name: "佐藤恵子"
+    age: 28
+    department_id: 1
+
+departments:
+  - department_id: 1
+    name: "営業部"
+
+  - department_id: 2
+    name: "技術部"
+`))
+	assert.Nil(t, err)
+
+}

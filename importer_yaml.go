@@ -28,6 +28,22 @@ func SourceYamlImporter(filenames ...string) SqlSource {
 	}
 }
 
+func SourceYamlStringImporter(yamlStrings ...string) SqlSource {
+	return func(tx *sql.Tx) ([]string, error) {
+		var retStmts []string
+		for _, yamlString := range yamlStrings {
+			stmts, err := yamlToSQLs([]byte(yamlString))
+			if err != nil {
+				return nil, err
+			}
+			if len(stmts) > 0 {
+				retStmts = append(retStmts, stmts...)
+			}
+		}
+		return retStmts, nil
+	}
+}
+
 func yamlToSQLs(data []byte) ([]string, error) {
 	if len(data) == 0 {
 		return []string{}, nil
