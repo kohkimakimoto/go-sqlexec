@@ -103,7 +103,24 @@ func CustomSqlSource() sqlexec.SqlSource {
 - `SourceDir`: The SQLs are provided from '*.sql' file(s) under the specific directory. The SQL files are executed in lexical order.
 - `SourceYamlImporter`: It provides a set of insert statements from YAML files.
 - `SourceYamlStringImporter`: It provides a set of insert statements from YAML strings.
+- `SourceYamlImporterWithOptions`: It provides YAML insert statements with options such as identifier quoting.
+- `SourceYamlStringImporterWithOptions`: It provides YAML string insert statements with options such as identifier quoting.
 - `SourceStructImporter` (Experimental): It provides a set of insert statements from Go structs.
+
+YAML importers keep identifiers unquoted by default. Use `SourceYamlImporterOptions.IdentifierQuote` to quote table and column names.
+
+```go
+sqlexec.SourceYamlStringImporterWithOptions(
+	sqlexec.SourceYamlImporterOptions{
+		IdentifierQuote: sqlexec.IdentifierQuoteBacktick,
+	},
+	`
+select:
+  - from: "users"
+    group: "admin"
+`,
+)
+```
 
 ## Author
 
