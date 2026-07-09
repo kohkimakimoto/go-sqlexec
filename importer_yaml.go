@@ -8,7 +8,27 @@ import (
 	"strings"
 )
 
+const (
+	// IdentifierQuoteNone disables identifier quoting.
+	IdentifierQuoteNone = ""
+	// IdentifierQuoteDouble uses double quotes for identifiers.
+	IdentifierQuoteDouble = `"`
+	// IdentifierQuoteBacktick uses backticks for identifiers.
+	IdentifierQuoteBacktick = "`"
+)
+
+// SourceYamlImporterOptions configures SourceYamlImporterWithOptions and SourceYamlStringImporterWithOptions.
+type SourceYamlImporterOptions struct {
+	// IdentifierQuote is the quote string used for table and column names.
+	// Empty string keeps identifiers unquoted.
+	IdentifierQuote string
+}
+
 func SourceYamlImporter(filenames ...string) SqlSource {
+	return SourceYamlImporterWithOptions(SourceYamlImporterOptions{}, filenames...)
+}
+
+func SourceYamlImporterWithOptions(options SourceYamlImporterOptions, filenames ...string) SqlSource {
 	return func(tx *sql.Tx) ([]string, error) {
 		var retStmts []string
 		for _, filename := range filenames {
@@ -16,7 +36,7 @@ func SourceYamlImporter(filenames ...string) SqlSource {
 			if err != nil {
 				return nil, err
 			}
-			stmts, err := yamlToSQLs(b)
+			stmts, err := yamlToSQLsWithOptions(b, options)
 			if err != nil {
 				return nil, err
 			}
@@ -29,10 +49,14 @@ func SourceYamlImporter(filenames ...string) SqlSource {
 }
 
 func SourceYamlStringImporter(yamlStrings ...string) SqlSource {
+	return SourceYamlStringImporterWithOptions(SourceYamlImporterOptions{}, yamlStrings...)
+}
+
+func SourceYamlStringImporterWithOptions(options SourceYamlImporterOptions, yamlStrings ...string) SqlSource {
 	return func(tx *sql.Tx) ([]string, error) {
 		var retStmts []string
 		for _, yamlString := range yamlStrings {
-			stmts, err := yamlToSQLs([]byte(yamlString))
+			stmts, err := yamlToSQLsWithOptions([]byte(yamlString), options)
 			if err != nil {
 				return nil, err
 			}
@@ -45,6 +69,10 @@ func SourceYamlStringImporter(yamlStrings ...string) SqlSource {
 }
 
 func yamlToSQLs(data []byte) ([]string, error) {
+	return yamlToSQLsWithOptions(data, SourceYamlImporterOptions{})
+}
+
+func yamlToSQLsWithOptions(data []byte, options SourceYamlImporterOptions) ([]string, error) {
 	if len(data) == 0 {
 		return []string{}, nil
 	}
@@ -55,7 +83,7 @@ func yamlToSQLs(data []byte) ([]string, error) {
 
 	var stmts []string
 	for i := 0; i < len(parsedData.Content[0].Content); i += 2 {
-		table := parsedData.Content[0].Content[i].Value
+		table := quoteSQLIdentifier(parsedData.Content[0].Content[i].Value, options.IdentifierQuote)
 		records := parsedData.Content[0].Content[i+1]
 		columnNames := []string{}
 		values := []string{}
@@ -63,7 +91,7 @@ func yamlToSQLs(data []byte) ([]string, error) {
 		for _, record := range records.Content {
 			rowValues := []string{}
 			for j := 0; j < len(record.Content); j += 2 {
-				col := record.Content[j].Value
+				col := quoteSQLIdentifier(record.Content[j].Value, options.IdentifierQuote)
 				val := record.Content[j+1]
 
 				if len(columnNames) < len(record.Content)/2 {
@@ -91,4 +119,11 @@ func yamlToSQLs(data []byte) ([]string, error) {
 		stmts = append(stmts, stmt)
 	}
 	return stmts, nil
+}
+
+func quoteSQLIdentifier(identifier, quote string) string {
+	if quote == "" {
+		return identifier
+	}
+	return fmt.Sprintf("%s%s%s", quote, strings.ReplaceAll(identifier, quote, quote+quote), quote)
 }
